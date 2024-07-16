@@ -1,45 +1,12 @@
-# FROM node:20.11.1-alpine
+FROM node:20.11.1-alpine
 
-# COPY . /app
-# WORKDIR /app
-
-# RUN npm install
-
-# RUN npm run build
-
-# EXPOSE 3000
-
-# CMD [ "npm", "start" ]
-
-# Install dependencies only when needed
-FROM node:20.11.1-alpine AS deps
+COPY . /app
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY . .
-COPY --from=deps /app/node_modules ./node_modules
+
+RUN npm install
+
 RUN npm run build
-
-# # Rebuild the source code only when needed
-# FROM node:20.11.1-alpine AS builder
-# WORKDIR /app
-# COPY . .
-# COPY --from=deps /app/node_modules ./node_modules
-# RUN npm run build
-
-# # Production image, copy all the files and run next
-# FROM node:16-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-
-# You only need to copy next.config.js if you are NOT using the default configuration
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD [ "npm", "start" ]
